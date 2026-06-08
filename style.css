@@ -1,0 +1,345 @@
+:root {
+  --bg-0: #07070c;
+  --bg-1: #12121c;
+  --bg-2: #1b1b29;
+  --text: #f2f2f7;
+  --muted: #9a9ab0;
+  --accent: #ffd93c;
+  --frame: #2a2a3d;
+  --frame-edge: #3a3a55;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: radial-gradient(ellipse at top, #1a1a2e 0%, var(--bg-0) 70%);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ---------- Header ---------- */
+.hero {
+  text-align: center;
+  padding: 28px 16px 12px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(28px, 5vw, 44px);
+  letter-spacing: 2px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #ff4d4d, #ffd93c, #7ed957, #4d9bff, #ff5cc8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: clamp(12px, 2vw, 15px);
+}
+
+kbd {
+  display: inline-block;
+  padding: 2px 7px;
+  margin: 0 1px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+  background: var(--bg-2);
+  border: 1px solid var(--frame-edge);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  color: var(--text);
+}
+
+/* ---------- Stage (xylophone + volume) ---------- */
+.stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2vw, 28px);
+  padding: 12px clamp(8px, 2.5vw, 24px) 24px;
+  min-height: 0;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+/* ---------- Xylophone ---------- */
+.xylophone {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(4px, 1vw, 12px);
+  padding: clamp(14px, 2.5vh, 28px) clamp(10px, 1.8vw, 22px);
+  background: linear-gradient(180deg, #2a2a3d 0%, #1c1c2c 100%);
+  border-radius: 18px;
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--frame-edge);
+  height: clamp(280px, 60vh, 460px);
+  touch-action: none;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 720px;
+  box-sizing: border-box;
+}
+
+.bar {
+  --bar-color: #fff;
+  --bar-len: 100%;
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 64px;
+  height: var(--bar-len);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--bar-color) 92%, white 8%) 0%,
+      var(--bar-color) 50%,
+      color-mix(in srgb, var(--bar-color) 70%, black 30%) 100%);
+  box-shadow:
+    0 8px 14px rgba(0, 0, 0, 0.45),
+    inset 0 2px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 4px 14px;
+  cursor: pointer;
+  transition:
+    transform 90ms ease-out,
+    box-shadow 200ms ease-out,
+    filter 200ms ease-out;
+  will-change: transform, box-shadow, filter;
+}
+
+/* small black "screws" near the top to anchor the bar visually */
+.bar::before,
+.bar::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #555, #111 70%);
+  transform: translateX(-50%);
+}
+.bar::before { top: 6px; }
+.bar::after  { bottom: 6px; }
+
+.bar .note {
+  font-size: clamp(11px, 1.5vw, 14px);
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.6);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+}
+
+.bar .key {
+  font-size: clamp(10px, 1.3vw, 13px);
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.55);
+  background: rgba(255, 255, 255, 0.5);
+  padding: 2px 7px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Active (pressed/struck) state */
+.bar.active {
+  transform: translateY(3px) scale(0.985);
+  filter: brightness(1.25) saturate(1.15);
+  box-shadow:
+    0 6px 10px rgba(0, 0, 0, 0.45),
+    0 0 24px 4px var(--bar-color),
+    0 0 60px 10px color-mix(in srgb, var(--bar-color) 60%, transparent),
+    inset 0 2px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* ---------- Volume panel ---------- */
+.volume-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 8px;
+  background: linear-gradient(180deg, #1d1d2c, #14141f);
+  border: 1px solid var(--frame-edge);
+  border-radius: 14px;
+  height: clamp(260px, 60vh, 460px);
+  width: 56px;
+  min-width: 56px;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+.vol-icon {
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  transition: color 150ms ease;
+}
+.vol-icon.muted { color: #ff5566; }
+
+.slider-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  min-height: 0;
+  position: relative;
+}
+
+/* Vertical range slider — cross-browser */
+.vol-slider {
+  -webkit-appearance: slider-vertical; /* Chrome/Safari/Edge */
+  appearance: slider-vertical;
+  writing-mode: vertical-lr;           /* Firefox & modern */
+  direction: rtl;                       /* so top = max */
+  width: 36px;
+  height: 100%;
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+}
+
+/* WebKit track / thumb */
+.vol-slider::-webkit-slider-runnable-track {
+  width: 8px;
+  height: 100%;
+  background: linear-gradient(to top, #2c2c40, #3c3c58);
+  border-radius: 999px;
+  border: 1px solid #1a1a26;
+}
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #ddd 60%, #999 100%);
+  border: 2px solid #1a1a26;
+  box-shadow: 0 0 10px rgba(255, 217, 60, 0.5);
+  margin-left: -8px; /* center thumb on track */
+  cursor: grab;
+}
+.vol-slider:active::-webkit-slider-thumb { cursor: grabbing; }
+
+/* Firefox */
+.vol-slider::-moz-range-track {
+  width: 8px;
+  height: 100%;
+  background: linear-gradient(to top, #2c2c40, #3c3c58);
+  border-radius: 999px;
+  border: 1px solid #1a1a26;
+}
+.vol-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #ddd 60%, #999 100%);
+  border: 2px solid #1a1a26;
+  box-shadow: 0 0 10px rgba(255, 217, 60, 0.5);
+  cursor: grab;
+}
+
+.vol-value {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* ---------- Footer ---------- */
+.foot {
+  text-align: center;
+  padding: 10px 16px 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---------- Responsive: phones ---------- */
+@media (max-width: 640px) {
+  .hero { padding: 16px 12px 6px; }
+  .hero h1 { letter-spacing: 1px; }
+
+  .stage {
+    gap: 6px;
+    padding: 8px 6px 16px;
+  }
+
+  .xylophone {
+    height: clamp(260px, 64vh, 520px);
+    gap: 4px;
+    padding: 14px 8px;
+    border-radius: 14px;
+  }
+
+  .bar {
+    max-width: 56px;
+  }
+
+  /* On small screens, hide the keyboard hint label (no keyboard) */
+  .bar .key {
+    display: none;
+  }
+
+  .volume-panel {
+    height: clamp(260px, 64vh, 520px);
+    width: 46px;
+    min-width: 46px;
+    padding: 10px 6px;
+  }
+
+  .slider-wrap { width: 28px; }
+  .vol-slider { width: 26px; }
+
+  .vol-value { font-size: 11px; min-width: 32px; }
+
+  .subtitle { font-size: 12px; }
+}
+
+/* Very narrow phones */
+@media (max-width: 380px) {
+  .stage { gap: 4px; padding: 6px 4px 12px; }
+  .xylophone { gap: 3px; padding: 12px 6px; }
+  .bar .note { font-size: 10px; }
+  .volume-panel { width: 42px; min-width: 42px; padding: 8px 4px; }
+  .slider-wrap { width: 24px; }
+  .vol-slider { width: 22px; }
+}

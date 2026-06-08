@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0d0d14" />
+  <title>Xylophone</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="hero">
+    <h1>Xylophone</h1>
+    <p class="subtitle">Play with <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>G</kbd> <kbd>H</kbd> <kbd>J</kbd> <kbd>K</kbd> &nbsp;·&nbsp; Tap on mobile</p>
+  </header>
+
+  <main class="stage">
+    <div class="xylophone" id="xylophone">
+      <div class="bar" data-key="A" data-note="C4"  data-freq="261.63" style="--bar-color:#ff4d4d; --bar-len:100%;">
+        <span class="note">C</span>
+        <span class="key">A</span>
+      </div>
+      <div class="bar" data-key="S" data-note="D4"  data-freq="293.66" style="--bar-color:#ff9a3c; --bar-len:96%;">
+        <span class="note">D</span>
+        <span class="key">S</span>
+      </div>
+      <div class="bar" data-key="D" data-note="E4"  data-freq="329.63" style="--bar-color:#ffd93c; --bar-len:92%;">
+        <span class="note">E</span>
+        <span class="key">D</span>
+      </div>
+      <div class="bar" data-key="F" data-note="F4"  data-freq="349.23" style="--bar-color:#7ed957; --bar-len:88%;">
+        <span class="note">F</span>
+        <span class="key">F</span>
+      </div>
+      <div class="bar" data-key="G" data-note="G4"  data-freq="392.00" style="--bar-color:#3cd1c0; --bar-len:84%;">
+        <span class="note">G</span>
+        <span class="key">G</span>
+      </div>
+      <div class="bar" data-key="H" data-note="A4"  data-freq="440.00" style="--bar-color:#4d9bff; --bar-len:80%;">
+        <span class="note">A</span>
+        <span class="key">H</span>
+      </div>
+      <div class="bar" data-key="J" data-note="B4"  data-freq="493.88" style="--bar-color:#9b6cff; --bar-len:76%;">
+        <span class="note">B</span>
+        <span class="key">J</span>
+      </div>
+      <div class="bar" data-key="K" data-note="C5"  data-freq="523.25" style="--bar-color:#ff5cc8; --bar-len:72%;">
+        <span class="note">C'</span>
+        <span class="key">K</span>
+      </div>
+    </div>
+
+    <aside class="volume-panel" aria-label="Volume control">
+      <div class="vol-icon" id="volIcon" aria-hidden="true">
+        <!-- speaker icon, swapped via JS when muted -->
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+          <path d="M3 10v4h4l5 5V5L7 10H3zm13.5 2a4.5 4.5 0 0 0-2.5-4.03v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06a9 9 0 0 0 0-17.54z"/>
+        </svg>
+      </div>
+      <div class="slider-wrap">
+        <input
+          type="range"
+          id="volume"
+          class="vol-slider"
+          min="0"
+          max="100"
+          value="70"
+          step="1"
+          orient="vertical"
+          aria-label="Volume"
+        />
+      </div>
+      <div class="vol-value" id="volValue">70%</div>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    <span>Made with Web Audio · No downloads, just play</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
