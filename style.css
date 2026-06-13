@@ -59,6 +59,35 @@ body {
   font-size: clamp(12px, 2vw, 15px);
 }
 
+/* ---------- April Fools button ---------- */
+.april-btn {
+  margin-top: 10px;
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #ff7eb6, #b07cff);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow:
+    0 6px 16px rgba(176, 124, 255, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: transform 120ms ease, box-shadow 200ms ease, filter 200ms ease;
+}
+.april-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.april-btn:active { transform: translateY(0); filter: brightness(0.95); }
+.april-btn[hidden] { display: none !important; }
+
+body.april-fools .april-btn {
+  background: linear-gradient(135deg, #ffd1e8, #c8e7ff);
+  color: #5a3a7a;
+  box-shadow:
+    0 6px 16px rgba(200, 231, 255, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
 kbd {
   display: inline-block;
   padding: 2px 7px;
@@ -107,6 +136,16 @@ kbd {
   max-width: 720px;
   box-sizing: border-box;
 }
+
+/* Default rainbow palette (overridden by April Fools mode below) */
+.bar:nth-child(1) { --bar-color: #ff4d4d; } /* C  - red    */
+.bar:nth-child(2) { --bar-color: #ff9a3c; } /* D  - orange */
+.bar:nth-child(3) { --bar-color: #ffd93c; } /* E  - yellow */
+.bar:nth-child(4) { --bar-color: #7ed957; } /* F  - green  */
+.bar:nth-child(5) { --bar-color: #3cd1c0; } /* G  - teal   */
+.bar:nth-child(6) { --bar-color: #4d9bff; } /* H  - blue   */
+.bar:nth-child(7) { --bar-color: #9b6cff; } /* J  - purple */
+.bar:nth-child(8) { --bar-color: #ff5cc8; } /* K  - pink   */
 
 .bar {
   --bar-color: #fff;
@@ -342,4 +381,138 @@ kbd {
   .volume-panel { width: 42px; min-width: 42px; padding: 8px 4px; }
   .slider-wrap { width: 24px; }
   .vol-slider { width: 22px; }
+}
+
+/* =========================================================
+   April Fools Mode — pastel "Xylitol" tweaks
+   Pastel page background + pastel bar colors + pastel title.
+   The xylophone frame, slider, subtitle, kbd, footer stay
+   in the normal dark theme.
+   ========================================================= */
+
+/* Pastel page background */
+body.april-fools {
+  background: radial-gradient(ellipse at top, #ffe6f3 0%, #e8f6ff 55%, #f6f0ff 100%);
+}
+body { transition: background 400ms ease; }
+
+/* Pastel palette overrides for the 8 bars
+   --bar-color : the very pale near-white tint
+   --bar-edge  : the saturated accent used for the corner markers */
+body.april-fools .bar:nth-child(1) { --bar-color: #fff2f5; --bar-edge: #ff4d7a; } /* pink   */
+body.april-fools .bar:nth-child(2) { --bar-color: #fff8ec; --bar-edge: #ff8a3c; } /* peach  */
+body.april-fools .bar:nth-child(3) { --bar-color: #fffef5; --bar-edge: #f0c020; } /* yellow */
+body.april-fools .bar:nth-child(4) { --bar-color: #f5fdf2; --bar-edge: #4ec070; } /* mint   */
+body.april-fools .bar:nth-child(5) { --bar-color: #f2fbf8; --bar-edge: #3aa899; } /* aqua   */
+body.april-fools .bar:nth-child(6) { --bar-color: #f2f7ff; --bar-edge: #4d80ff; } /* blue   */
+body.april-fools .bar:nth-child(7) { --bar-color: #f7f2ff; --bar-edge: #8a5cff; } /* purple */
+body.april-fools .bar:nth-child(8) { --bar-color: #fff5fb; --bar-edge: #ff5cc8; } /* lilac  */
+
+/* Almost-solid pastel finish in April Fools mode */
+body.april-fools .bar {
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--bar-color) 45%, white 55%) 0%,
+      var(--bar-color) 50%,
+      color-mix(in srgb, var(--bar-color) 98%, black 2%) 100%);
+  box-shadow:
+    0 4px 10px rgba(140, 110, 170, 0.15),
+    inset 0 2px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* Repurpose the ::before / ::after pseudo-elements as corner markers
+   that hug the bar's outer edge (instead of the dark "screws" used in
+   normal mode).
+   ::before  -> ㄱ on the top-right    (uses top + right edges)
+   ::after   -> ㄴ on the bottom-left  (uses left + bottom edges)
+   The marker's outer rounded corner matches the bar's 8px border-radius
+   so it sits flush with the bar's outline. */
+body.april-fools .bar::before,
+body.april-fools .bar::after {
+  background: transparent;
+  width: 16px;
+  height: 16px;
+  transform: none;
+  border: 2px solid var(--bar-edge);
+  border-radius: 0;
+}
+
+body.april-fools .bar::before {
+  top: -1px;
+  right: -1px;
+  left: auto;
+  border-bottom: none;
+  border-left: none;
+  border-top-right-radius: 8px;
+}
+
+body.april-fools .bar::after {
+  bottom: -1px;
+  left: -1px;
+  top: auto;
+  border-top: none;
+  border-right: none;
+  border-bottom-left-radius: 8px;
+}
+
+/* Pastel "Xylitol" title gradient — a touch deeper so the text stays readable */
+body.april-fools .hero h1 {
+  background: linear-gradient(90deg, #ff9eb5, #ffc28f, #ffe082, #a8e6a3, #8fd9c8, #9fc7ff, #b8a3ff, #ff9ee0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Smooth transition for the bar colors when toggling mode */
+.bar { transition: background 400ms ease, box-shadow 200ms ease-out, filter 200ms ease-out, transform 90ms ease-out; }
+
+/* "Chew" animation: bar snaps horizontally with a jagged, zig-zag crack
+   (like a piece of Xylitol gum breaking), then re-joins.
+   No color / brightness change. */
+@keyframes xylo-chew {
+  0% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transform: none;
+  }
+  35% {
+    /* Two parallel sawtooth lines: the bottom edge is the top edge
+       translated straight down by 8%, so at every x the gap is exactly
+       the same. That gives a uniform zig-zag band (no rhombus holes). */
+    clip-path: polygon(
+      /* --- top piece (top + right edge → sawtooth → left edge) --- */
+      0 0, 100% 0,
+      100% 44%,
+      87.5% 56%, 75% 44%,
+      62.5% 56%, 50% 44%,
+      37.5% 56%, 25% 44%,
+      12.5% 56%, 0 44%,
+
+      /* --- bottom piece (left edge → same sawtooth shifted +8% → right edge) --- */
+      0 52%,
+      12.5% 64%, 25% 52%,
+      37.5% 64%, 50% 52%,
+      62.5% 64%, 75% 52%,
+      87.5% 64%, 100% 52%,
+      100% 100%, 0 100%);
+    transform: translateY(1px);
+  }
+  70% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transform: none;
+  }
+  100% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transform: none;
+  }
+}
+
+/* In April Fools mode, override the bright glow + lift on `.active`
+   with the chew animation. Keep colors exactly as the resting state. */
+body.april-fools .bar.active {
+  transform: none;
+  filter: none;
+  box-shadow:
+    0 4px 10px rgba(140, 110, 170, 0.15),
+    inset 0 2px 0 rgba(255, 255, 255, 0.7);
+  animation: xylo-chew 240ms ease-out;
 }

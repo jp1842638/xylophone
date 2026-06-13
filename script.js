@@ -42,11 +42,37 @@
     }
   }
 
+  // ---------- April Fools state ----------
+  // Mode flag is flipped from the bottom of this file via setAprilFools().
+  let aprilFoolsActive = false;
+
+  // Reusable noise buffer for "chew" effect (built lazily once)
+  let noiseBuffer = null;
+  function getNoiseBuffer() {
+    if (!audioCtx) return null;
+    if (noiseBuffer) return noiseBuffer;
+    const len = Math.floor(audioCtx.sampleRate * 0.25); // 250ms is plenty
+    noiseBuffer = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < len; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    return noiseBuffer;
+  }
+
   // ---------- Tone synthesis (xylophone-ish) ----------
   function playTone(freq) {
     if (!audioCtx || !masterGain) return;
     if (volume <= 0) return; // truly muted: skip work entirely
 
+    if (aprilFoolsActive) {
+      playChewyTone(freq);
+    } else {
+      playNormalTone(freq);
+    }
+  }
+
+  function playNormalTone(freq) {
     const now = audioCtx.currentTime;
 
     // Two oscillators layered: fundamental (sine) + soft overtone (triangle 2x)
@@ -86,6 +112,82 @@
     osc2.stop(now + decay + 0.05);
   }
 
+  // April Fools / Xylitol mode: same pitch, but softer + a chewy noise burst on top.
+  function playChewyTone(freq) {
+    const now = audioCtx.currentTime;
+
+    // --- Main tone: a softer sine, slightly detuned, with a tiny vibrato ---
+    const osc = audioCtx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.value = freq;
+    osc.detune.value = -4; // ~4 cents flat for a soft, candy-like vibe
+
+    // Small vibrato (LFO -> osc.detune)
+    const lfo = audioCtx.createOscillator();
+    lfo.type = "sine";
+    lfo.frequency.value = 5.5; // Hz
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.value = 4; // ±4 cents
+    lfo.connect(lfoGain).connect(osc.detune);
+
+    // Subtle second-harmonic shimmer (very quiet)
+    const shimmer = audioCtx.createOscillator();
+    shimmer.type = "sine";
+    shimmer.frequency.value = freq * 2;
+
+    const toneGain = audioCtx.createGain();
+    const shimmerGain = audioCtx.createGain();
+    toneGain.gain.value = 0;
+    shimmerGain.gain.value = 0;
+
+    const peak = 0.4;
+    const shimmerPeak = 0.05;
+    const attack = 0.006;
+    const decay = 1.0;
+
+    toneGain.gain.setValueAtTime(0, now);
+    toneGain.gain.linearRampToValueAtTime(peak, now + attack);
+    toneGain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+
+    shimmerGain.gain.setValueAtTime(0, now);
+    shimmerGain.gain.linearRampToValueAtTime(shimmerPeak, now + attack);
+    shimmerGain.gain.exponentialRampToValueAtTime(0.0001, now + decay * 0.6);
+
+    osc.connect(toneGain).connect(masterGain);
+    shimmer.connect(shimmerGain).connect(masterGain);
+
+    osc.start(now);
+    shimmer.start(now);
+    lfo.start(now);
+    osc.stop(now + decay + 0.05);
+    shimmer.stop(now + decay + 0.05);
+    lfo.stop(now + decay + 0.05);
+
+    // --- Chewy noise burst on top ---
+    const buf = getNoiseBuffer();
+    if (buf) {
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buf;
+
+      // Bandpass it so it sounds like a soft "ch" / chew, not raw hiss
+      const bp = audioCtx.createBiquadFilter();
+      bp.type = "bandpass";
+      bp.frequency.value = 1200;
+      bp.Q.value = 0.9;
+
+      const noiseGain = audioCtx.createGain();
+      const noisePeak = 0.18;
+      const noiseDecay = 0.09; // ~90ms — short and punchy
+      noiseGain.gain.setValueAtTime(0, now);
+      noiseGain.gain.linearRampToValueAtTime(noisePeak, now + 0.001);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + noiseDecay);
+
+      noise.connect(bp).connect(noiseGain).connect(masterGain);
+      noise.start(now);
+      noise.stop(now + noiseDecay + 0.02);
+    }
+  }
+
   // ---------- DOM wiring ----------
   const xylophone = document.getElementById("xylophone");
   const bars = Array.from(document.querySelectorAll(".bar"));
@@ -98,13 +200,15 @@
 
   function flashBar(bar) {
     if (!bar) return;
+    // Remove + force reflow + re-add so the CSS animation restarts
+    // even when the same bar is struck repeatedly in quick succession.
+    bar.classList.remove("active");
+    void bar.offsetWidth;
     bar.classList.add("active");
-    // Re-trigger animation if already active
-    // Use a short timeout aligned with CSS transition
     clearTimeout(bar._flashTimer);
     bar._flashTimer = setTimeout(() => {
       bar.classList.remove("active");
-    }, 160);
+    }, 240);
   }
 
   function strike(bar) {
@@ -267,4 +371,67 @@
     },
     { passive: false }
   );
+
+  // ---------- April Fools mode ----------
+  const aprilBtn = document.getElementById("aprilFoolsBtn");
+  const siteTitle = document.getElementById("siteTitle");
+  const siteSubtitle = document.getElementById("siteSubtitle");
+
+  const ORIGINAL_TITLE = "Xylophone";
+  const APRIL_TITLE = "Xylitol";
+  const ORIGINAL_SUBTITLE_HTML = siteSubtitle ? siteSubtitle.innerHTML : "";
+  const APRIL_SUBTITLE_HTML =
+    "Chew with " +
+    "<kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> <kbd>F</kbd> " +
+    "<kbd>G</kbd> <kbd>H</kbd> <kbd>J</kbd> <kbd>K</kbd>" +
+    ". Don't worry, it's sugar free!";
+
+  const LS_KEY = "xylo-april-fools";
+
+  function isAprilFirst() {
+    const d = new Date();
+    return d.getMonth() === 3 && d.getDate() === 1; // April = 3 (0-indexed)
+  }
+
+  function setAprilFools(on) {
+    aprilFoolsActive = !!on;
+    document.body.classList.toggle("april-fools", aprilFoolsActive);
+
+    if (siteTitle) siteTitle.textContent = aprilFoolsActive ? APRIL_TITLE : ORIGINAL_TITLE;
+    document.title = aprilFoolsActive ? APRIL_TITLE : ORIGINAL_TITLE;
+    if (siteSubtitle) {
+      siteSubtitle.innerHTML = aprilFoolsActive ? APRIL_SUBTITLE_HTML : ORIGINAL_SUBTITLE_HTML;
+    }
+    if (aprilBtn) {
+      aprilBtn.textContent = aprilFoolsActive
+        ? "April Fools Mode 🤡 (ON)"
+        : "April Fools Mode 🤡";
+      aprilBtn.setAttribute("aria-pressed", aprilFoolsActive ? "true" : "false");
+    }
+
+    try {
+      localStorage.setItem(LS_KEY, aprilFoolsActive ? "1" : "0");
+    } catch (_) {}
+  }
+
+  // Show button only on April 1
+  const showButton = isAprilFirst();
+  if (aprilBtn && showButton) {
+    aprilBtn.hidden = false;
+
+    aprilBtn.addEventListener("click", () => {
+      setAprilFools(!aprilFoolsActive);
+    });
+
+    // Restore previous state for today
+    try {
+      const saved = localStorage.getItem(LS_KEY);
+      if (saved === "1") setAprilFools(true);
+    } catch (_) {}
+  } else {
+    // Not April 1 — make sure stale state from a previous April 1 is cleared.
+    try {
+      localStorage.removeItem(LS_KEY);
+    } catch (_) {}
+  }
 })();
